@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>分页</title>
+<style type="text/css">
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td{margin:0;padding:0;}html{font-size: 12px;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;}table{border-collapse:collapse;border-spacing:0;}q:before,q:after{content:'';}object,embed{vertical-align:top;}hr,legend{display:none;}img,abbr,acronym,fieldset{border:0;}ul li{list-style-type:none;}a,label{cursor:pointer;}img{vertical-align:bottom;margin:0;padding:0;}a{text-decoration:none;outline: none;}.clearfix:after{content: "."; visibility: hidden; display: block; height: 0.1px; font-size:0.1em; line-height: 0; clear: both;}.clearfix {*zoom:1;}input ,textarea,select{outline: none;border:1px solid #e6e6e6;}button{cursor: pointer;color: #666;}textarea{resize: none;outline: none;overflow: hidden;padding: 5px;}select{outline: none;}a{color: #808080;}
+html {
+    font-family: "Microsoft YaHei",tahoma,arial,"Hiragino Sans GB","\5b8b\4f53",sans-serif;
+    color: #333;
+    font-size: 12px;
+}
+body {
+    background-color: #f2f2f2;
+}
+/*公共分页开始*/
+.com-page {
+    display: none;
+    margin: 50px auto;
+    width: 1190px;
+    text-align: center;
+    color: #4d4d4d;
+}
+.com-page .page-item {
+    display: inline-block;
+    margin-right: 2px;
+    width: 34px;
+    line-height: 30px;
+    background: #fff;
+    color: #4d4d4d;
+    border:1px solid #e6e6e6;
+    box-sizing: border-box;
+}
+.com-page .page-active {
+    background: #f05b1a;
+    color: #fff;
+    border-color: #f05b1a;
+}
+.com-page .page-item:hover {
+    border-color: #f05b1a;
+    color: #f05b1a;
+}
+.com-page .page-active:hover {
+    color: #fff;
+}
+.com-page .page-prev,
+.com-page .page-next {
+    width: 74px;
+}
+.com-page .page-trun-box {
+    display: inline-block;
+    margin-left: 10px;
+}
+.com-page .page-turn-input {
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    padding: 0 5px;
+}
+.com-page .page-trun-btn {
+    display: inline-block;
+    width: 40px;
+    line-height: 30px;
+    background: #fff;
+    border:1px solid #e6e6e6;
+}
+.com-page .unable-page {
+    background: #d2d2d2;
+    cursor:not-allowed;
+}
+.com-page .pages-box {
+    display: inline-block;
+}
+/*公共分页结束*/
+</style>
+</head>
+<body>
+<div class="com-page" id="comPage"></div>
+
+<script src="http://static.nysochina.com/static/js/lib/jquery-1.11.1.min.js"></script>
+<script>
+(function ($) { 
+    $.fn.pager = function(options ,fn) { 
+        // 注入的html结构
+        var html = '<a href="javascript:;" class="page-prev page-item unable-page"><上一页</a><div class="pages-box" id="pagesBox"></div><a href="javascript:;" class="page-item page-next">下一页></a><div class="page-trun-box"><span>共<span class="all-pages">100</span>页， </span><span>向第</span><input type="text" class="page-turn-input" onkeyup="value=value.replace(/[^\d]/g,"")" /> <span>页</span> <a href="javascript:;" class="page-trun-btn">跳转</a></div>';
+        // 初始化
+        $(this).html('').append(html);
+        var defaultParams = {
+                index : 1,//当前页数
+                pageTotal : 0,//总页数
+                min : 0,
+                max : 10//最多显示多少页码数
+            },
+            $oThis = $(this),
+            $pagesBox = $oThis.find('#pagesBox'),
+            $allPages = $oThis.find('.all-pages'),
+            $pagePrev = $oThis.find('.page-prev'), 
+            $pageNext = $oThis.find('.page-next'), 
+            $pageTrun = $oThis.find('.page-trun-btn'),
+            $pageInput = $oThis.find('.page-turn-input'),
+            pagePrams = $.extend(defaultParams, options);
+            fn = fn || function() {};
+            pagePrams.index = parseInt(pagePrams.index);
+            pagePrams.pageTotal = parseInt(pagePrams.pageTotal);
+        if ( pagePrams.pageTotal==0 ) {
+            $oThis.hide();
+        } else {
+            $oThis.show();
+            if ( pagePrams.pageTotal<=pagePrams.max ) {
+                pagePrams.max = pagePrams.pageTotal;
+            }
+            $allPages.text(pagePrams.pageTotal);
+            showPageindex();
+            if( pagePrams.index==1 ) {
+                $pagePrev.addClass('unable-page');
+            }
+            if( pagePrams.pageTotal === 1 || pagePrams.index==pagePrams.pageTotal ) {
+                $pageNext.addClass('unable-page');
+            }
+        }
+        // 点击事件
+        $pagePrev.on('click', function() {
+            if ( $(this).hasClass('unable-page') ) {
+                return;
+            }
+            pagePrams.index--;
+            showPageindex();
+            fn(pagePrams.index);
+            
+        });
+        $pageNext.on('click', function() {
+            if ( $(this).hasClass('unable-page') ) {
+                return;
+            }
+            pagePrams.index++;
+            showPageindex();
+            fn(pagePrams.index);
+        });
+        // 点击跳转按钮
+        $pageTrun.on('click', function() {
+            index = $pageInput.val();
+            if( index== pagePrams.index ) {
+                return;
+            }
+            if( index !== '' ) {
+                index = parseInt($pageInput.val()) ;
+                if( index < 1 ) {
+                    alert('输入页数不能小于1！')
+                    return;
+                } else if (index > pagePrams.pageTotal) {
+                    alert('输入页数不能大于总页数！');
+                    return;
+                } else {
+                    pagePrams.index = index;
+                    showPageindex();
+                    fn(pagePrams.index);
+                }
+            } else {
+                alert('请输入页数');
+            }  
+        });
+        //页码显示
+        function showPageindex() {
+            var min = 0 ,
+                max = pagePrams.max;
+            if( pagePrams.index <= pagePrams.max/2) {
+                min = 0;
+                max = max;
+            } else if ( pagePrams.pageTotal - pagePrams.index <= Math.ceil(pagePrams.max/2) ) {
+                min = pagePrams.pageTotal - pagePrams.max;
+                max = pagePrams.pageTotal;
+            } else {
+                min = Math.round(pagePrams.index - pagePrams.max/2);
+                max = Math.round(pagePrams.index + pagePrams.max/2);
+            }
+            var html = '';
+            $pagesBox.html('');
+            for(var i = min+1; i < max+1; i++) {
+                var $a = "<a href='javascript:;' class='page-num page-item"  ;
+                if ( i==pagePrams.index ) {
+                    $a += " page-active' data-page="+ i + ">" + i + "</a>";; 
+                } else {
+                    $a += "' data-page="+ i + ">" + i + "</a>";
+                }
+                html += $a;
+            }
+            $pagesBox.append(html);
+            $pageInput.val(pagePrams.index);
+            $oThis.find('a').removeClass('unable-page');
+            $pagesBox.find('.page-num').on('click' , function() {
+                pagePrams.index = parseInt($(this).attr('data-page'));
+                showPageindex();
+                fn(pagePrams.index);
+            });
+        }
+    }; 
+})(jQuery);
+var pageNum = 1;
+function searchByKey() {
+    //这里是查询的请求，重置分页器写在ajax请求的success里面
+    $('#comPage').pager({
+        index : pageNum,
+        pageTotal : 20
+    }, function(page) {
+        pageNum = page;
+        searchByKey();
+    });
+}
+searchByKey();
+</script>
+    
+</body>
+</html>

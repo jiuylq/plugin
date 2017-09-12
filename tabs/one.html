@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>tab</title>
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+	<script type="text/javascript" src="js/one.js"></script>
+
+<style>
+* { margin: 0; padding: 0; border: 0; }
+ul li { list-style: none; }
+.clear { clear: both }
+.clearfix:after { display: block; clear: both; content: ""; visibility: hidden; height: 0 }
+.clearfix { zoom: 1 }
+.on { color: #358199;		/* background-color:#b0e0ef; */ border-bottom: 0 !important; }
+.active { background-color: red !important; }
+#tab { width: 650px; margin: 0 auto; border: 1px dashed red; overflow: hidden; }
+.tablist { }
+.tablist ul li { float: left; width: 128px; text-align: center; height: 45px; line-height: 45px; border: 1px solid #dedede; cursor: pointer; }
+.tablist ul li:hover { color: #a8810d;		/* background-color:#e9ddb9; */ }
+.tabtext { width: 650px; height: 350px; position: relative; overflow: hidden; }
+.tabtext ul { }
+.tabtext ul li { display: none; width: 650px; height: 350px; line-height: 350px; text-align: center;		/* background-color: rgb(51, 255, 0); */ }
+.prev, .next { cursor: pointer; }
+.btn { text-align: center; }
+.btn ul { display: inline-block; }
+.btn ul li { width: 10px; height: 10px; line-height: 10px; border-radius: 5px; background: #cdcdcd; display: inline-block; margin: 0 1px; overflow: hidden; cursor: pointer; }
+</style>
+</head>
+<body>
+	
+	<div id="tab">
+		<div class="tablist clearfix">
+			<ul>
+				<li>list1</li>
+				<li class="on">list2</li>
+				<li>list3</li>
+				<li>list4</li>
+				<li>list5</li>
+			</ul>
+		</div>
+
+		<div class="tabtext">
+			<ul>
+				<li>tabs（jq小封装）具体样式根据实际要求修改，这里只是一个简单的效果</li>
+				<li style="display:block;">I am list2  I am list2  I am list2  I am list2  I am list2  I am list2  I am list2</li>
+				<li>I am list3  I am list3  I am list3  I am list3  I am list3  I am list3  I am list3</li>
+				<li>I am list4  I am list4  I am list4  I am list4  I am list4  I am list4  I am list4</li>
+				<li>I am list5  I am list5  I am list5  I am list5  I am list5  I am list5  I am list5</li>
+			</ul>
+		</div>
+<!-- 小圆点不需要时可删除 如需要请设置 aicon:true -->
+<div class="btn"><ul></ul></div>
+	</div>
+<script>
+	$("#tab").Tab({
+		listClass:'.tablist ul',
+		conClass:'.tabtext ul',
+		speed:300,
+		bind:'click',
+		animation:'left',//none ,left , up ,fadein
+		auto:true,
+		pvnt:true,
+		aicon:true,
+	});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<!-- <link href="css/base.css" rel="stylesheet">
+<link href="css/all.css" rel="stylesheet"> -->
+<style type="text/css">
+.shopping-part {
+    height: 455px
+}
+.shopping-part .shopping-part-left {
+    height: 100px;
+    border: 1px solid #dfdfdf;
+    width: 485px;
+    float: left
+}
+.shopping-part .shopping-part-left .production-big-pic {
+    height: 360px
+}
+.shopping-part .shopping-part-left .production-big-pic img {
+    width: 100%
+}
+.shopping-part .shopping-part-left .production-small-pic {
+    height: 90px;
+    margin-top: 2px;
+    overflow: hidden;
+    position: relative
+}
+.shopping-part .shopping-part-left .production-small-pic .product-small-pic-next, .shopping-part .shopping-part-left .production-small-pic .product-small-pic-prev {
+    height: 40px;
+    width: 20px;
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    font-size: 20px;
+    line-height: 40px;
+    color: white;
+    text-align: center;
+    opacity: 0;
+    transition: opacity ease-in 0.5s
+}
+.shopping-part .shopping-part-left .production-small-pic .product-small-pic-next {
+    top: 25px;
+    right: 0
+}
+.shopping-part .shopping-part-left .production-small-pic .product-small-pic-prev {
+    top: 25px;
+    left: 0
+}
+.shopping-part .shopping-part-left .production-small-pic:hover .product-small-pic-next, .shopping-part .shopping-part-left .production-small-pic:hover .product-small-pic-prev {
+    opacity: 1
+}
+.shopping-part .shopping-part-left .production-small-pic .product-small-pic-list {
+    width: 750px;
+    height: 90px;
+    padding: 5px
+}
+.shopping-part .shopping-part-left .production-small-pic img {
+    width: 120px;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    float: left;
+    padding-right: 5px
+}
+.shopping-part .shopping-part-right {
+    height: 455px;
+    width: 510px;
+    float: right;
+    padding: 20px;
+    line-height: 35px;
+    font-size: 16px
+}
+.shopping-part .shopping-part-right .product-title {
+    height: 35px;
+    line-height: 35px;
+    font-size: 18px
+}
+</style>
+</head>
+<body>
+    <section class="public-wrap-content shopping-part">
+         <div class="shopping-part-left" style="margin:100px;overflow: hidden;" id="content">
+             <div class="production-small-pic">
+                <div class="" id="imgWrap">
+                    <div class="product-small-pic-list"  id="imglist" style="width:2000px;">
+                         <img src="http://www.zxhuan.com/wp-content/uploads/2016/02/img1.jpg">
+                         <img src="http://www.zxhuan.com/wp-content/uploads/2016/02/img2.jpg">
+                         <img src="http://www.zxhuan.com/wp-content/uploads/2016/02/img3.jpg">
+                         <img src="http://www.zxhuan.com/wp-content/uploads/2016/02/img4.jpg">
+                         <img src="http://www.zxhuan.com/wp-content/uploads/2016/02/img5.jpg">
+                     </div>
+                </div>
+             </div>
+         </div>
+     </section>
+     <script type="text/javascript" src='jquery.min.js'></script>
+     <!-- <script type="text/javascript" src='index.js'></script> -->
+     <script type="text/javascript">
+         (function($, window, document, undefiend) {
+            $.fn.scrollImg = function(option) {
+                // 默认参数
+                this.default = {
+                    imgBox: null,
+                    nextBtn: true,//是否使用 prev 按钮
+                    prevBtn: true,//是否使用 next 按钮
+                    speed: 500,//手动滚动速度
+                    time:2000,//自动滚动间隔时间
+                    autoPlay: true,//是否开启自动滚动
+                    hoverLock: true,//鼠标移入移出锁定
+                }
+                // 初始化入口
+                this.init = function() {
+                    var self = this;
+                    this.option = $.extend({}, this.default, option);
+                    this.run = null;
+                    self.buld();
+                }
+                // 创建
+                this.buld = function() {
+                    var self = this;
+                    self.ele = $(this.option.imgBox);
+                    self.len = self.ele.find('img').length;
+                    self.w = self.ele.find('img').eq(0).outerWidth();
+                    self.imglist = self.ele.find('img').clone();
+                    self.imglist.appendTo(self.ele);
+                    self.ele.css('margin-left', -self.w);
+                    self.flag=true;
+                    // 是否开始自动轮播
+                    if (self.option.autoPlay) {
+                        self.play();
+                    }
+                    //鼠标移入停止，移出开始
+                    if (self.option.hoverLock) {
+                        $(self.option.imgBox).on('mouseenter', function() {
+                            self.stop();
+                        });
+                        $(self.option.imgBox).on('mouseleave', function() {
+                            self.play();
+                        });
+                    }
+                    //手动创建按钮
+                    if(self.option.nextBtn){
+                        self.nextBtnEle=$('<a href="javascript:;" class="product-small-pic-next" id="next"><code>></code></a>').prependTo(self.option.imgBox)
+                    }
+                    if(self.option.prevBtn){
+                        self.prevBtnEle=$('<a href="javascript:;" class="product-small-pic-prev" id="prev"><code><</code></a>').prependTo(self.option.imgBox)
+                    }
+                    // 手动操作按钮
+                    if(self.option.nextBtn){
+                        self.nextBtnEle.bind('click',function(){
+                            self.startGo(-self.w)
+                        })
+                    }
+                    if(self.option.prevBtn){
+                        self.prevBtnEle.bind('click',function(){
+                            self.startGo(self.w)
+                        })
+                    }
+                }
+                // 滚动
+                this.startGo = function(num) {
+                    var self = this;
+                    if(self.flag){
+                        self.flag=false;//防止恶意点击
+                        self.mgLeft = parseInt(self.ele.css('marginLeft'));
+                        self.mgLeft = self.mgLeft + num;
+                        self.ele.animate({
+                            'margin-left': self.mgLeft + "px"
+                        }, self.option.speed, 'swing', function() {
+                            if (parseInt(self.ele.css('margin-left')) < -self.w * self.len) {
+                                self.ele.css('margin-left', -self.w);
+                            }
+                            if (parseInt(self.ele.css('margin-left')) > -self.w) {
+                                self.ele.css('margin-left', -self.w * self.len);
+                            };
+                            self.flag=true;
+                        })
+                    }
+                }
+                // 启动定时器
+                this.play = function() {
+                    var self = this;
+                    self.run = setInterval(function() {
+                        self.startGo(-self.w);
+                    }, self.option.time );
+                }
+                // 停止计时器
+                this.stop = function() {
+                    var self = this;
+                    clearInterval(self.run);
+                }
+                // 调用
+                this.init();
+            }
+         })(jQuery, window, document)
+         $('#imgWrap').scrollImg({
+            imgBox: '#imglist',
+            nextBtn: true,
+            prevBtn: true
+         })
+     </script>
+</body>
+</html>
