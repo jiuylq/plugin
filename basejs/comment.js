@@ -326,6 +326,57 @@ function trim(str){
     }
 }
 
+/**
+ * @desc 格式化处理字符串
+ * @param {String} str 
+ * @param {String} delimiter
+ * @param {Number} size
+**/
+    //ecDo.formatText('1234asda567asd890')
+    //result："12,34a,sda,567,asd,890"
+    //ecDo.formatText('1234asda567asd890',4,' ')
+    //result："1 234a sda5 67as d890"
+    //ecDo.formatText('1234asda567asd890',4,'-')
+    //result："1-234a-sda5-67as-d890"
+function formatText(str, size = 3, delimiter = ',') {
+    var regText = '\\B(?=(\\w{' + size + '})+(?!\\w))';
+    var reg = new RegExp(regText, 'g');
+    return str.replace(reg, delimiter);
+}
+
+
+/**
+ * @desc 数字格式化 
+ * @param {Number} num
+**/
+//formatNumber(12535) => 1.25万
+function formatNumber(num){
+    return num > 1e4 && 1e8 > num ? (num / 1e4).toFixed(2) + "万" : num > 1e8 ? (num / 1e8).toFixed(2) + "亿" : 1e4 > num ? num : void 0
+}
+
+
+//pos 表示保留几位小数
+// 格式化人数
+var str=DATA.hot.toString(),nn=str.length,m,r;
+function formatFloat(str, pos){
+    var re =new RegExp("(?=(?!(\\b))(\\d{"+m+"})+$)","g");
+    str=str.replace(re,".");
+    return Math.round(str*Math.pow(10, pos))/Math.pow(10, pos);
+};
+if( 0 <= nn && nn <4 ){
+    r=str;
+}else if( 4 <= nn && nn <= 8 ){
+    m=4;
+    r=formatFloat(str, 2) + "万";
+}else if( 8 < nn && nn <= 13 ){
+    m=8;
+    r=formatFloat(str, 2)+ "亿";
+}else if( 13< nn){
+    m=13;
+    r=formatFloat(str, 2)+ "兆";
+}
+
+
 
 /**
  * @desc 获取浏览器类型和版本
@@ -374,18 +425,28 @@ function getOS() {
 //将当前时间转时间截
 var currentTime = Date.parse(new Date())
 
-//将时间截转换为日期  例："2017-12-18 16:26:34"
-function formatDate(nows) { 
-    var now=new Date(nows); 
-    var year=now.getFullYear(); 
-    var month=now.getMonth()+1; 
-    var date=now.getDate(); 
-    var hour=now.getHours(); 
-    var minute=now.getMinutes(); 
-    var second=now.getSeconds(); 
-    return year+"-"+month+"-"+date+" "+hour+":"+minute+":"+second; 
+/**
+ * @desc  将时间截转换为日期
+**/
+//formatDate("1513585594000") => "2017-12-18 16:26:34"
+function formatDate(date) { 
+    if(typeof date !== "number"){
+        date = parseInt(date);
     }
+    var now=new Date(nows);
+    var year=now.getFullYear(); 
+    var month=now.getMonth()+1;
+    var date=now.getDate();
+    var hour=now.getHours();
+    var minute=now.getMinutes();
+    var second=now.getSeconds();
+    return year+"-"+month+"-"+date+" "+hour+":"+minute+":"+second;
+}
 
+function formatTimeToYYYYMMDD(e) {
+    var t = new Date(e);
+    return t.getFullYear() + "-" + (t.getMonth() + 1) + "-" + t.getDate()
+}
 
 
 /**
@@ -427,5 +488,47 @@ function getEleCount(obj, str) {
 
 
 /**
+ * @desc js字符串与Unicode编码互相转换
+ * @param {String} str
+ */
+function encodeUnicode(str) {  
+    var res = [];  
+    for ( var i=0; i<str.length; i++ ) {  
+        res[i] = ( "00" + str.charCodeAt(i).toString(16) ).slice(-4);  
+    }  
+    return "\\u" + res.join("\\u");  
+}  
+  
+// 解码  
+function decodeUnicode(str) {  
+    str = str.replace(/\\/g, "%");  
+    return unescape(str);  
+}  
 
+/**
+ * @desc Unicode转ASCII
+ * @param {String} str
 **/
+//UnicodeToAscii("\u4e2d\u56fd")
+function UnicodeToAscii(str){ 
+    var result='';
+    for (var i = 0; i < str.length; i++)
+        result += '&#' + str.charCodeAt(i) + ';';
+    return result;
+}
+
+/**
+ * @desc ASCII转换Unicode
+ * @param {String} str
+**/
+//AsciiToUnicode("&#20013;&#22269;")
+function AsciiToUnicode(str) {
+    var code = content.match(/&#(\d+);/g);
+    result= '';
+    for (var i=0; i<code.length; i++)
+        result += String.fromCharCode(code[i].replace(/[&#;]/g, ''));
+    return result;
+  }
+
+
+  
